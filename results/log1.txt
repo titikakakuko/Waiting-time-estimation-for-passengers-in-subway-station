@@ -1,0 +1,315 @@
+frame:  0
+frame:  1
+frame:  2
+find id =  4
+find id =  9
+find id =  10
+find id =  13
+frame:  3
+find id =  4
+find id =  9
+find id =  10
+find id =  13
+find id =  17
+find id =  20
+frame:  4
+find id =  4
+find id =  9
+find id =  10
+find id =  13
+find id =  17
+find id =  20
+find id =  22
+frame:  5
+find id =  4
+find id =  9
+find id =  10
+find id =  13
+find id =  17
+find id =  20
+find id =  22
+find id =  25
+find id =  26
+frame:  6
+find id =  4
+find id =  9
+find id =  10
+find id =  13
+find id =  20
+find id =  25
+find id =  26
+find id =  31
+find id =  32
+find id =  33
+frame:  7
+find id =  4
+find id =  9
+find id =  10
+find id =  20
+find id =  25
+find id =  26
+find id =  31
+find id =  32
+find id =  33
+find id =  34
+find id =  39
+frame:  8
+find id =  9
+find id =  10
+find id =  20
+find id =  26
+find id =  31
+find id =  32
+find id =  33
+find id =  34
+find id =  39
+find id =  40
+find id =  43
+frame:  9
+find id =  9
+find id =  10
+find id =  20
+find id =  31
+find id =  32
+find id =  33
+find id =  34
+find id =  39
+find id =  40
+find id =  43
+frame:  10
+find id =  9
+find id =  10
+find id =  25
+find id =  31
+find id =  32
+find id =  33
+find id =  34
+find id =  39
+find id =  40
+find id =  47
+find id =  54
+frame:  11
+find id =  10
+find id =  25
+find id =  31
+find id =  32
+find id =  39
+find id =  40
+find id =  47
+find id =  54
+find id =  56
+find id =  63
+frame:  12
+find id =  10
+find id =  31
+find id =  34
+find id =  39
+find id =  47
+find id =  54
+find id =  56
+find id =  63
+frame:  13
+find id =  9
+find id =  10
+find id =  25
+find id =  31
+find id =  34
+find id =  40
+find id =  43
+find id =  47
+find id =  54
+find id =  73
+frame:  14
+find id =  9
+find id =  10
+find id =  25
+find id =  26
+find id =  31
+find id =  34
+find id =  39
+find id =  40
+find id =  43
+find id =  54
+find id =  56
+find id =  73
+frame:  15
+find id =  10
+find id =  26
+find id =  34
+find id =  39
+find id =  56
+find id =  87
+find id =  90
+frame:  16
+find id =  10
+find id =  39
+find id =  56
+find id =  87
+find id =  90
+find id =  92
+find id =  94
+find id =  95
+frame:  17
+find id =  9
+find id =  10
+find id =  20
+find id =  32
+find id =  33
+find id =  34
+find id =  47
+find id =  56
+find id =  87
+find id =  90
+find id =  92
+find id =  94
+find id =  95
+frame:  18
+find id =  9
+find id =  10
+find id =  13
+find id =  20
+find id =  25
+find id =  32
+find id =  33
+find id =  34
+find id =  40
+find id =  47
+find id =  56
+find id =  73
+find id =  87
+find id =  90
+find id =  92
+find id =  95
+frame:  19
+find id =  9
+find id =  10
+find id =  13
+find id =  25
+find id =  33
+find id =  40
+find id =  43
+find id =  54
+find id =  73
+find id =  87
+find id =  92
+find id =  95
+frame:  20
+find id =  9
+find id =  10
+find id =  13
+find id =  25
+find id =  31
+find id =  33
+find id =  43
+find id =  54
+find id =  63
+find id =  92
+frame:  21
+find id =  9
+find id =  10
+find id =  13
+find id =  25
+find id =  31
+find id =  33
+find id =  39
+find id =  54
+find id =  56
+find id =  63
+frame:  22
+find id =  9
+find id =  13
+find id =  31
+find id =  33
+find id =  39
+find id =  54
+find id =  56
+find id =  63
+frame:  23
+find id =  9
+find id =  13
+find id =  25
+find id =  31
+find id =  33
+find id =  54
+find id =  63
+find id =  73
+frame:  24
+find id =  9
+find id =  13
+find id =  20
+find id =  25
+find id =  31
+find id =  33
+find id =  54
+find id =  63
+find id =  73
+find id =  94
+frame:  25
+find id =  9
+find id =  13
+find id =  20
+find id =  25
+find id =  33
+find id =  47
+find id =  63
+find id =  94
+frame:  26
+find id =  13
+find id =  20
+find id =  26
+find id =  47
+find id =  90
+frame:  27
+find id =  13
+find id =  26
+find id =  33
+find id =  39
+find id =  43
+find id =  47
+find id =  90
+find id =  92
+frame:  28
+find id =  13
+find id =  25
+find id =  26
+find id =  33
+find id =  39
+find id =  43
+find id =  54
+find id =  92
+find id =  94
+frame:  29
+find id =  10
+find id =  13
+find id =  25
+find id =  33
+find id =  43
+find id =  54
+find id =  73
+find id =  92
+find id =  94
+find id =  165
+类别:  | id: 92 | 上行撞线 | 上行撞线总数: 1 | 上行id列表: [92]
+frame:  30
+find id =  10
+find id =  13
+find id =  25
+find id =  26
+find id =  33
+find id =  39
+find id =  47
+find id =  54
+find id =  73
+find id =  94
+find id =  165
+frame:  31
+find id =  10
+find id =  13
+find id =  25
+find id =  26
+find id =  33
+find id =  34
+find id =  39
+find id =  47
+find id =  54
+find id =  92
