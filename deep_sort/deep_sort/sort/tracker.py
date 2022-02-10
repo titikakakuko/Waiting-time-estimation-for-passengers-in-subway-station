@@ -5,6 +5,7 @@ from . import kalman_filter
 from . import linear_assignment
 from . import iou_matching
 from .track import Track
+from sklearn.metrics import pairwise_distances
 
 
 class Tracker:
@@ -37,7 +38,7 @@ class Tracker:
 
     """
 
-    def __init__(self, metric, max_iou_distance=0.7, max_age=70, n_init=3):
+    def __init__(self, metric, max_iou_distance=0.6, max_age=70, n_init=3):
         self.metric = metric
         self.max_iou_distance = max_iou_distance
         self.max_age = max_age
@@ -91,7 +92,6 @@ class Tracker:
             np.asarray(features), np.asarray(targets), active_targets)
 
     def _match(self, detections):
-
         def gated_metric(tracks, dets, track_indices, detection_indices):
             features = np.array([dets[i].feature for i in detection_indices])
             targets = np.array([tracks[i].track_id for i in track_indices])
@@ -101,6 +101,12 @@ class Tracker:
                 detection_indices)
 
             return cost_matrix
+
+        if len(self.tracks) == 0:
+            detection_indices = np.arange(len(detections))
+            features = np.array([detections[i].feature for i in detection_indices])
+            index = self.first_frame_initialization(features)
+            detections = [detections[index]]
 
         # Split track set into confirmed and unconfirmed tracks.
         confirmed_tracks = [
@@ -136,3 +142,17 @@ class Tracker:
             mean, covariance, self._next_id, self.n_init, self.max_age,
             detection.feature))
         self._next_id += 1
+
+    def update_tracks(self):
+        del_idx = []
+        for i in range(len(self.tracks)):
+            if self.tracks[i].time_since_update > 3:
+                del_idx.append(i)
+        for j in reversed(del_idx):
+            del self.tracks[j]
+
+    def first_frame_initialization(self, features):
+        n_ins = features.shape[0]
+        dis_mat = pairwise_distances(features)
+        dis_avg_feat = dis_mat.sum(axis=1)
+        return np.argmax(dis_avg_feat)

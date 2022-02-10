@@ -11,7 +11,7 @@ class Detector:
 
     def __init__(self):
         self.img_size = 640
-        self.threshold = 0.3
+        self.threshold = 0.75
         self.stride = 1
 
         self.weights = './weights/yolov5m.pt'

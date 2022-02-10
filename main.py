@@ -1,55 +1,13 @@
 import numpy as np
-
+import sys
 import tracker
-from detector import Detector
+# from detector import Detector
 import glob, cv2, torch
 
+sys.path.insert(0, 'E:/2dTracking/CrowdDet-master/lib')
+from utils import misc_utils, visual_utils
+
 if __name__ == '__main__':
-
-    # 根据视频尺寸，填充一个polygon，供撞线计算使用
-    mask_image_temp = np.zeros((1080, 1920), dtype=np.uint8)
-
-    # 初始化2个撞线polygon
-    list_pts_blue = [[204, 305], [227, 431], [605, 522], [1101, 464], [1900, 601], [1902, 495], [1125, 379], [604, 437],
-                     [299, 375], [267, 289]]
-    ndarray_pts_blue = np.array(list_pts_blue, np.int32)
-    polygon_blue_value_1 = cv2.fillPoly(mask_image_temp, [ndarray_pts_blue], color=1)
-    polygon_blue_value_1 = polygon_blue_value_1[:, :, np.newaxis]
-
-    # 填充第二个polygon
-    mask_image_temp = np.zeros((1080, 1920), dtype=np.uint8)
-    list_pts_yellow = [[181, 305], [207, 442], [603, 544], [1107, 485], [1898, 625], [1893, 701], [1101, 568],
-                       [594, 637], [118, 483], [109, 303]]
-    ndarray_pts_yellow = np.array(list_pts_yellow, np.int32)
-    polygon_yellow_value_2 = cv2.fillPoly(mask_image_temp, [ndarray_pts_yellow], color=2)
-    polygon_yellow_value_2 = polygon_yellow_value_2[:, :, np.newaxis]
-
-    # 撞线检测用mask，包含2个polygon，（值范围 0、1、2），供撞线计算使用
-    polygon_mask_blue_and_yellow = polygon_blue_value_1 + polygon_yellow_value_2
-
-    # 缩小尺寸，1920x1080->960x540
-    polygon_mask_blue_and_yellow = cv2.resize(polygon_mask_blue_and_yellow, (960, 540))
-
-    # 蓝 色盘 b,g,r
-    blue_color_plate = [255, 0, 0]
-    # 蓝 polygon图片
-    blue_image = np.array(polygon_blue_value_1 * blue_color_plate, np.uint8)
-
-    # 黄 色盘
-    yellow_color_plate = [0, 255, 255]
-    # 黄 polygon图片
-    yellow_image = np.array(polygon_yellow_value_2 * yellow_color_plate, np.uint8)
-
-    # 彩色图片（值范围 0-255）
-    color_polygons_image = blue_image + yellow_image
-    # 缩小尺寸，1920x1080->960x540
-    color_polygons_image = cv2.resize(color_polygons_image, (960, 540))
-
-    # list 与蓝色polygon重叠
-    list_overlapping_blue_polygon = []
-
-    # list 与黄色polygon重叠
-    list_overlapping_yellow_polygon = []
 
     # 进入数量
     down_count = 0
@@ -60,155 +18,153 @@ if __name__ == '__main__':
     draw_text_postion = (int(960 * 0.01), int(540 * 0.05))
 
     # 初始化 yolov5
-    detector = Detector()
+    # detector = Detector()
 
     # 打开视频
     # capture = cv2.VideoCapture('./video/test.mp4')
     # capture = cv2.VideoCapture('/mnt/datasets/datasets/towncentre/TownCentreXVID.avi')
 
     # 打开图片文件夹
-    image_files = sorted(glob.glob('./video/red_trousers/*.jpg'))
+    image_files = sorted(glob.glob('C:/Users/yinuowang3/Downloads/FOV02/20190416/19/*.jpg'))
+    detecter_img_dir = 'E:/2dTracking/Waiting-time-estimation-for-passengers-in-subway-station/results/detecter_img/'
+    id_img_dir = 'E:/2dTracking/Waiting-time-estimation-for-passengers-in-subway-station/results/CNet-0.99/'
+    half_img_dir = 'E:/2dTracking/Waiting-time-estimation-for-passengers-in-subway-station/results/set_y1/'
 
-    f_idx=0
-    while True:
-        # 读取每帧图片
-        # _, im = capture.read()
-        im=cv2.imread(image_files[f_idx])
-        print('frame: ', f_idx)
-        f_idx += 1
+    threshold = 0.99
+    img_root = 'C:/Users/yinuowang3/Downloads/FOV02/20190416/19/'
+    json_file = 'E:/2dTracking/CrowdDet-master/model/rcnn_fpn_baseline/outputs/eval_dump/dump-19-40.json'
+
+    time_counting={}
+    time_avg = []
+    time_avg_idx = 0
+    one_min_full = False
+    ids=[89, 129, 111, 189, 305, 420, 425, 478, 491, 499, 541, 555, 642, 656, 781, 827, 867, 829, 1008]
+    # im_tmp = None
+
+    misc_utils.ensure_dir('outputs')
+    records = misc_utils.load_json_lines(json_file)#[:args.number]
+
+    for record in records:
+        dtboxes = misc_utils.load_bboxes(
+                record, key_name='dtboxes', key_box='box', key_score='score', key_tag='tag')
+        gtboxes = misc_utils.load_bboxes(record, 'gtboxes', 'box')
+        dtboxes = misc_utils.xywh_to_xyxy(dtboxes)
+        gtboxes = misc_utils.xywh_to_xyxy(gtboxes)
+        keep = dtboxes[:, -2] > threshold
+        dtboxes = dtboxes[keep]
+
+        img_path = img_root + record['ID'] + '.jpg'
+        im = misc_utils.load_img(img_path)
+        # print(img_path)
+        # im=cv2.imread(img_path)
+    # for f_idx in range(len(image_files)):
+    #     # 读取每帧图片
+    #     # _, im = capture.read()
+    #     im=cv2.imread(image_files[f_idx])
+    #     print('frame: ', f_idx)
         if im is None:
             break
-
-        # 缩小尺寸，1920x1080->960x540
-        im = cv2.resize(im, (960, 540))
+        
+        # 缩小尺寸，1080x720->960x540
+        # im = cv2.resize(im, (960, 540))
+        
+        width = im.shape[1]
+        height = im.shape[0]
+        bboxes=[]
+        for i in range(len(dtboxes)):
+            one_box = dtboxes[i]
+            one_box = np.array([max(one_box[0], 0), max(one_box[1], 0),
+                        min(one_box[2], width - 1), min(one_box[3], height - 1)])
+            x1,y1,x2,y2 = np.array(one_box[:4]).astype(int)
+            bbox=[x1,y1,x2,y2,'person',float(dtboxes[i][4])]
+            bboxes.append(bbox)
 
         list_bboxs = []
-        bboxes = detector.detect(im)
+        # bboxes = detector.detect(im)
+        im_cpy = im
+        
+        # for bbox in bboxes:
+        #     x1, y1, x2, y2, label, acc = bbox
+        #     im_cpy = cv2.rectangle(im_cpy, (x1,y1), (x2,y2), (0,0,0), 5)
+        time_frame = 0
+        person_count = 0
+        item_bbox_id=None
 
-        # 如果画面中 有bbox
         if len(bboxes) > 0:
             list_bboxs = tracker.update(bboxes, im)
+            for item_bbox in list_bboxs:
+                x1, y1, x2, y2, label, track_id = item_bbox
+                # # check whether the person is the chosen one
+                # if track_id in ids:
+                #     # check whether the person is on the upper half of the image
+                #     if (y1+y2)/2<=360 :
+                #         item_bbox_id = item_bbox
+                if track_id not in time_counting.keys():
+                    time_counting[track_id] = 0
+                else:
+                    time_counting[track_id] += 5
+                person_count+=1
+                time_frame += time_counting[track_id]
 
-            # 画框
-            # 撞线检测点，(x1，y1)，y方向偏移比例 0.0~1.0
-            output_image_frame = tracker.draw_bboxes(im, list_bboxs, line_thickness=None)
-            pass
+            # draw the bboxes
+
+            # # for id-checking
+            # if item_bbox_id is not None:
+            #     output_image_frame = tracker.draw_bboxes(im, [item_bbox_id], time_counting, line_thickness=None)
+            # else:
+            #     output_image_frame = im         
+            output_image_frame = tracker.draw_bboxes(im, list_bboxs, time_counting, line_thickness=None)
+        # output_image_frame = im_cpy
+        # cv2.imwrite(detecter_img_dir+str(f_idx)+'.jpg', output_image_frame)
+        #     if f_idx > 0:
+        #         output_image_frame = tracker.draw_bboxes(im_tmp, list_bboxs, time_counting, line_thickness=None)
+        #     else:
+        #         output_image_frame = im
+        # else:
+        #     if im_tmp is not None:
+        #         output_image_frame = im_tmp
+        #     else:
+        #         output_image_frame = im
         else:
-            # 如果画面中 没有bbox
             output_image_frame = im
+        cv2.imwrite(id_img_dir+str(record['ID'])+'.jpg', output_image_frame)
+        
+        if not one_min_full:
+            time_avg.append(0)
+        if time_frame == 0:
+            time_avg[time_avg_idx] = 0
+        else:
+            time_avg[time_avg_idx] = float(time_frame) / person_count
+        time_avg_idx = (time_avg_idx+1) % 12
+        if time_avg_idx == 0:
+            one_min_full = True
+
+        print(float(sum(time_avg)) / len(time_avg))
         pass
 
         # 输出图片
-        output_image_frame = cv2.add(output_image_frame, color_polygons_image)
+        # output_image_frame = cv2.add(output_image_frame, color_polygons_image)
 
         if len(list_bboxs) > 0:
-            # ----------------------判断撞线----------------------
-            for item_bbox in list_bboxs:
-                x1, y1, x2, y2, label, track_id = item_bbox
-
-                # 撞线检测点，(x1，y1)，y方向偏移比例 0.0~1.0
-                y1_offset = int(y1 + ((y2 - y1) * 0.6))
-
-                # 撞线的点
-                y = y1_offset
-                x = x1
-
-                if polygon_mask_blue_and_yellow[y, x] == 1:
-                    # 如果撞 蓝polygon
-                    if track_id not in list_overlapping_blue_polygon:
-                        list_overlapping_blue_polygon.append(track_id)
-                    pass
-
-                    # 判断 黄polygon list 里是否有此 track_id
-                    # 有此 track_id，则 认为是 外出方向
-                    if track_id in list_overlapping_yellow_polygon:
-                        # 外出+1
-                        up_count += 1
-
-                        print(f'类别: {label} | id: {track_id} | 上行撞线 | 上行撞线总数: {up_count} | 上行id列表: {list_overlapping_yellow_polygon}')
-
-                        # 删除 黄polygon list 中的此id
-                        list_overlapping_yellow_polygon.remove(track_id)
-
-                        pass
-                    else:
-                        # 无此 track_id，不做其他操作
-                        pass
-
-                elif polygon_mask_blue_and_yellow[y, x] == 2:
-                    # 如果撞 黄polygon
-                    if track_id not in list_overlapping_yellow_polygon:
-                        list_overlapping_yellow_polygon.append(track_id)
-                    pass
-
-                    # 判断 蓝polygon list 里是否有此 track_id
-                    # 有此 track_id，则 认为是 进入方向
-                    if track_id in list_overlapping_blue_polygon:
-                        # 进入+1
-                        down_count += 1
-
-                        print(f'类别: {label} | id: {track_id} | 下行撞线 | 下行撞线总数: {down_count} | 下行id列表: {list_overlapping_blue_polygon}')
-
-                        # 删除 蓝polygon list 中的此id
-                        list_overlapping_blue_polygon.remove(track_id)
-
-                        pass
-                    else:
-                        # 无此 track_id，不做其他操作
-                        pass
-                    pass
-                else:
-                    pass
-                pass
-
-            pass
-
-            # ----------------------清除无用id----------------------
-            list_overlapping_all = list_overlapping_yellow_polygon + list_overlapping_blue_polygon
-            for id1 in list_overlapping_all:
-                is_found = False
-                for _, _, _, _, _, bbox_id in list_bboxs:
-                    if bbox_id == id1:
-                        is_found = True
-                        break
-                    pass
-                pass
-
-                if not is_found:
-                    # 如果没找到，删除id
-                    if id1 in list_overlapping_yellow_polygon:
-                        list_overlapping_yellow_polygon.remove(id1)
-                    pass
-                    if id1 in list_overlapping_blue_polygon:
-                        list_overlapping_blue_polygon.remove(id1)
-                    pass
-                pass
-            list_overlapping_all.clear()
-            pass
-
+            
             # 清空list
             list_bboxs.clear()
 
-            pass
-        else:
-            # 如果图像中没有任何的bbox，则清空list
-            list_overlapping_blue_polygon.clear()
-            list_overlapping_yellow_polygon.clear()
-            pass
-        pass
+        #     pass
+        # pass
 
-        text_draw = 'DOWN: ' + str(down_count) + \
-                    ' , UP: ' + str(up_count)
-        output_image_frame = cv2.putText(img=output_image_frame, text=text_draw,
-                                         org=draw_text_postion,
-                                         fontFace=font_draw_number,
-                                         fontScale=1, color=(255, 255, 255), thickness=2)
+        # text_draw = 'DOWN: ' + str(down_count) + \
+        #             ' , UP: ' + str(up_count)
+        # output_image_frame = cv2.putText(img=output_image_frame, text=text_draw,
+        #                                  org=draw_text_postion,
+        #                                  fontFace=font_draw_number,
+        #                                  fontScale=1, color=(255, 255, 255), thickness=2)
 
         cv2.imshow('demo', output_image_frame)
-        cv2.waitKey(1000)
-
-        pass
-    pass
+        cv2.waitKey(10)
+        # im_tmp = im
+    #     pass
+    # pass
 
     # capture.release()
     cv2.destroyAllWindows()

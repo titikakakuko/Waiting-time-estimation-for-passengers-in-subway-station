@@ -12,7 +12,7 @@ __all__ = ['DeepSort']
 
 
 class DeepSort(object):
-    def __init__(self, model_path, max_dist=0.2, min_confidence=0.3, nms_max_overlap=1.0, max_iou_distance=0.7, max_age=70, n_init=3, nn_budget=100, use_cuda=True):
+    def __init__(self, model_path, max_dist=0.2, min_confidence=0.3, nms_max_overlap=1.0, max_iou_distance=0.6, max_age=70, n_init=3, nn_budget=100, use_cuda=True):
         self.min_confidence = min_confidence
         self.nms_max_overlap = nms_max_overlap
 
@@ -40,6 +40,7 @@ class DeepSort(object):
         self.tracker.predict()
         self.tracker.update(detections)
 
+        self.tracker.update_tracks()
         # output bbox identities
         outputs = []
         for track in self.tracker.tracks:
@@ -49,6 +50,7 @@ class DeepSort(object):
             x1,y1,x2,y2 = self._tlwh_to_xyxy(box)
             track_id = track.track_id
             outputs.append(np.array([x1,y1,x2,y2,track_id], dtype=np.int))
+        
         if len(outputs) > 0:
             outputs = np.stack(outputs,axis=0)
         return outputs
