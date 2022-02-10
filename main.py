@@ -17,14 +17,14 @@ if __name__ == '__main__':
     font_draw_number = cv2.FONT_HERSHEY_SIMPLEX
     draw_text_postion = (int(960 * 0.01), int(540 * 0.05))
 
-    # 初始化 yolov5
+    # yolov5
     # detector = Detector()
 
-    # 打开视频
+    # video
     # capture = cv2.VideoCapture('./video/test.mp4')
     # capture = cv2.VideoCapture('/mnt/datasets/datasets/towncentre/TownCentreXVID.avi')
 
-    # 打开图片文件夹
+    # image
     image_files = sorted(glob.glob('C:/Users/yinuowang3/Downloads/FOV02/20190416/19/*.jpg'))
     detecter_img_dir = 'E:/2dTracking/Waiting-time-estimation-for-passengers-in-subway-station/results/detecter_img/'
     id_img_dir = 'E:/2dTracking/Waiting-time-estimation-for-passengers-in-subway-station/results/CNet-0.99/'
@@ -58,7 +58,7 @@ if __name__ == '__main__':
         # print(img_path)
         # im=cv2.imread(img_path)
     # for f_idx in range(len(image_files)):
-    #     # 读取每帧图片
+    #     # read frames
     #     # _, im = capture.read()
     #     im=cv2.imread(image_files[f_idx])
     #     print('frame: ', f_idx)
@@ -140,10 +140,6 @@ if __name__ == '__main__':
             one_min_full = True
 
         print(float(sum(time_avg)) / len(time_avg))
-        pass
-
-        # 输出图片
-        # output_image_frame = cv2.add(output_image_frame, color_polygons_image)
 
         if len(list_bboxs) > 0:
             
